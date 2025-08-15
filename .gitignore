@@ -42,3 +42,4 @@
 
 *.cpp__tests
 private/*
+.vscode/
