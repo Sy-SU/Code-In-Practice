@@ -21,181 +21,37 @@ void solve() {
 		ind[p[i]] = i;
 	}
 
-	if (x[ind[1]] == '1' || x[ind[n]] == '1') {
+	int l = std::min(ind[1], ind[n]), r = std::max(ind[1], ind[n]);
+
+	std::string s(n + 1, '0');
+
+	auto f = [&](int l, int r) -> void {
+		for (int i = l; i <= r; i++) {
+			if (p[i] > std::min(p[l], p[r]) && p[i] < std::max(p[l], p[r])) {
+				s[i] = '1';
+			}
+		}
+	};
+
+	f(1, r), f(1, l), f(l, n), f(r, n), f(l, r);
+
+	bool isok = 1;
+	for (int i = 1; i <= n; i++) {
+		if (x[i] == '1' && s[i] == '0') {
+			isok = 0;
+		} 
+	}
+
+	if (isok == 0) {
 		std::cout << -1 << '\n';
-		return;
-	}
-
-	bool need = 0;
-	for (int i = std::min(ind[1], ind[n]) + 1; i < std::max(ind[1], ind[n]); i++) {
-		if (x[i] == '1') {
-			need = 1;
-		}
-	}
-
-	if (need) {
-		std::vector<std::pair<int, int>> op;
-		op.push_back({std::min(ind[1], ind[n]), std::max(ind[1], ind[n])});
-
-		for (int s = 0; s < 16; s++) {
-			int _s = s;
-			int indl = std::min(ind[1], ind[n]), indr = std::max(ind[1], ind[n]);
-			int tl = 1, tr = 0;
-			int l = n, r = 1;
-			if (ind[1] < ind[n]) {
-				tl = 0, tr = 1;
-				l = 1, r = n;
-			}
-
-			std::vector<std::pair<int, int>> tmp;
-
-			for (int round = 1; round <= 4; round++) {
-				if (_s % 2) {
-					// left
-					if (tl == 0) {
-						for (int i = r - 1; i > indl; i--) {
-							if (ind[i] < ind[l]) {
-								tmp.push_back({i, l});
-								l = i, tl = 1;
-								break;
-							}
-						}
-					} else {
-						for (int i = l + 1; i < indr; i++) {
-							if (ind[i] < ind[r]) {
-								tmp.push_back({i, l});
-								l = i, tl = 0;
-								break;
-							}
-						}
-					}
-				} else {
-					// right
-					if (tr == 0) {
-						for (int i = r - 1; i > indl; i--) {
-							if (ind[i] > ind[r]) {
-								tmp.push_back({r, i});
-								r = i, tr = 1;
-								break;
-							}
-						}
-					} else {
-						for (int i = l + 1; i < indr; i++) {
-							if (ind[i] > ind[r]) {
-								tmp.push_back({r, i});
-								r = i, tr = 0;
-								break;
-							}
-						}
-					}
-				}
-				_s /= 2;
-			}
-
-			bool isok = 1;
-			for (int i = 1; i < indl; i++) {
-				if (x[i] == '1') {
-					isok = 0;
-				}
-			}
-			for (int i = indr + 1; i <= n; i++) {
-				if (x[i] == '1') {
-					isok = 0;
-				}
-			}
-
-			if (isok) {
-				for (auto [l, r] : op) {
-					tmp.push_back({l, r});
-				} 
-
-				std::cout << tmp.size() << '\n';
-				for (auto [l, r] : tmp) {
-					std::cout << l << " " << r << '\n';
-				}
-
-				return;
-			}
-		}
 	} else {
-		for (int s = 0; s < 32; s++) {
-			int _s = s;
-			int indl = std::min(ind[1], ind[n]), indr = std::max(ind[1], ind[n]);
-			int tl = 1, tr = 0;
-			int l = n, r = 1;
-			if (ind[1] < ind[n]) {
-				tl = 0, tr = 1;
-				l = 1, r = n;
-			}
-
-			std::vector<std::pair<int, int>> tmp;
-
-			for (int round = 1; round <= 5; round++) {
-				if (_s % 2) {
-					// left
-					if (tl == 0) {
-						for (int i = r - 1; i > indl; i--) {
-							if (ind[i] < ind[l]) {
-								tmp.push_back({i, l});
-								l = i, tl = 1;
-								break;
-							}
-						}
-					} else {
-						for (int i = l + 1; i < indr; i++) {
-							if (ind[i] < ind[r]) {
-								tmp.push_back({i, l});
-								l = i, tl = 0;
-								break;
-							}
-						}
-					}
-				} else {
-					// right
-					if (tr == 0) {
-						for (int i = r - 1; i > indl; i--) {
-							if (ind[i] > ind[r]) {
-								tmp.push_back({r, i});
-								r = i, tr = 1;
-								break;
-							}
-						}
-					} else {
-						for (int i = l + 1; i < indr; i++) {
-							if (ind[i] > ind[r]) {
-								tmp.push_back({r, i});
-								r = i, tr = 0;
-								break;
-							}
-						}
-					}
-				}
-				_s /= 2;
-			}
-
-			bool isok = 1;
-			for (int i = 1; i < l; i++) {
-				if (x[i] == '1') {
-					isok = 0;
-				}
-			}
-			for (int i = r + 1; i <= n; i++) {
-				if (x[i] == '1') {
-					isok = 0;
-				}
-			}
-
-			if (isok) {
-				std::cout << tmp.size() << '\n';
-				for (auto [l, r] : tmp) {
-					std::cout << l << " " << r << '\n';
-				}
-
-				return;
-			}
-		}
+		std::cout << 5 << '\n';
+		std::cout << 1 << " " << r << '\n';
+		std::cout << 1 << " " << l << '\n';
+		std::cout << l << " " << n << '\n';
+		std::cout << r << " " << n << '\n';
+		std::cout << l << " " << r << '\n';
 	}
-	std::cout << -1 << '\n';
 }	
 
 int main() {
